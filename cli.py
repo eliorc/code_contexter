@@ -162,17 +162,15 @@ def add_to_tree(
         return False
 
     if path.is_file():
-        content_included = filter_path(path, root_path, gitignore_spec, **content_filters)
-        if content_included:
-            file_text = Text(path.name)
-            if is_file_empty(path):
-                file_text.append(" [empty]", style="dim italic")
-            elif is_binary_file(path):
-                file_text.append(" [binary]", style="dim italic")
-            else:
-                file_text.append(" [content]", style="dim italic")
-            tree.add(file_text)
-            return True
+        file_text = Text(path.name)
+        if is_file_empty(path):
+            file_text.append(" [empty]", style="dim italic")
+        elif is_binary_file(path):
+            file_text.append(" [binary]", style="dim italic")
+        elif filter_path(path, root_path, gitignore_spec, **content_filters):
+            file_text.append(" [content]", style="dim italic")
+        tree.add(file_text)
+        return True
     else:
         branch = Tree(path.name)
         has_visible_children = False
@@ -185,8 +183,6 @@ def add_to_tree(
             return True
         else:
             return False
-
-    return False
 
 
 def print_file_contents(path: Path) -> None:
